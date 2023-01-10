@@ -109,9 +109,6 @@ In main program (invoke function):
 So the program returns 1.0 where the given function reaches its minimum value.
 
 
-Graphic representation of the default function:
-
-![image_1](https://user-images.githubusercontent.com/118490278/211590736-50399c8e-c1b9-4b0d-a57e-05a15d4d1b84.jpg)
 
 
 Display of line number 7, i.e. display of the search results for the extreme.
@@ -259,7 +256,3 @@ In the 26th line of the code, the points x1 and x2 are returned to the initial f
 which gives us the minimum for y and the maximum for y. 
 We have everything we need to print a dot, and we print it by calling the print() function. 
 In our case we are only interested in the maximum point and it is MAX(-3, 71).
-
-Graphing the function, we see that our maximum is correct.
-
-![image_2](https://user-images.githubusercontent.com/118490278/211589311-0bc33eef-177b-420b-bfe9-8d17520bad6e.jpg)
