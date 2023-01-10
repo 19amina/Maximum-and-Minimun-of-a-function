@@ -3,7 +3,7 @@ from math import e
 number1 = (math.sqrt(5) – 1) / 2
 number2 = (3 - math.sqrt(5)) / 2
 	 
-def  golden_section (f, a, b, tol = 1e-5, h = None, c = None, d = None, fc = None, fd = None):
+def golden_section (f, a, b, tol = 1e-5, h = None, c = None, d = None, fc = None, fd = None):
   print(a, b, c, d, fc, fd)
   (a, b) = (min(a, b), max(a, b))
   if h is None: h = b – a
@@ -21,5 +21,5 @@ def  golden_section (f, a, b, tol = 1e-5, h = None, c = None, d = None, fc = Non
 f = lambda x: e**((x-2)**2)
 a = -5
 b = 5
-(c, d) = zlatni_rez(f, a, b)
+(c, d) = golden_section(f, a, b)
 print(f((c + d)/2))
