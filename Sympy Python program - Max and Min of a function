@@ -1,0 +1,265 @@
+Amina Dacić
+Faculty of natural sciences
+Theoretical computer science
+
+                                  Program for determining the maximum (minimum) of a function
+                                  
+
+SHORT INTRODUCTION:
+
+The purpose of the document is a description of the method for determining the maximum (minimum) of a given function without the use of derivation, 
+and in the second part with the use of derivation and presentation of the implementation of the algorithm made in the Python programming language for 
+calculating the function. The first method is the golden ratio method.
+
+
+GOLDEN SECTION METHOD/SEARCH
+Functions defined on an interval can generally have more than one maximum (minimum), so that only one of them is called a global maximum (minimum),
+while all others are local maximums (minimums).
+For a better understanding of this method, we will familiarize ourselves with the term unimodal function.
+
+Def: A function ƒ: [a, b] → R is said to be unimodal on the interval [a, b] if ƒ reaches only one maximum (minimum).
+
+Another requirement for functions is their continuity. The following is the definition of the continuity of the function. So:
+
+Def: We say that a function ƒ is continuous at a point c if the function has a value at that point at all, 
+and if its value when approaching the observed point from the left or right also approaches its value at the observed point.
+
+In this document, only continuous unimodal functions on the given interval [a, b] are used.
+
+If f(x) is a unimodal function on [a, b] then it is possible to replace that interval with the subinterval [a1, b1] on which f(x) reaches its maximum (minimum). 
+Finding the maximum of f is equivalent to finding the minimum of the function –f. 
+The term optimization is used equally with the term function minimization. 
+We will consider the case of finding the minimum, which is analogous to the case for the maximum.
+
+Two interior points are chosen from the interval [a, b], c < d, which fulfill the relation a < c < d < b. 
+The condition that the function is unimodal ensures that the values of f(c) and f(d) are less than max{f(a), f(b)}. 
+Let us consider two cases.
+
+If f(c) ≤ f(d) the minimum is located on the subinterval [a, d], so we replace b with d and continue the search on the new interval [a, d].
+If f(d) < f(c) the minimum is located on the subinterval [c, b], so we replace a with c and continue the search on the new interval [c, b].
+
+The interior points c and d are chosen so that the resulting intervals [a, c] and [d, b] are symmetric, i.e. b – d = c – a, where
+
+c = a + (1 – r)(b – a) = a + (1 – r)b
+d = b – (1 – r)(b – a) = (1 – r)a + b, 1/2 < r < 1
+
+We want the value of r to remain constant on each subinterval. 
+One of the old interior points will be used as the interior point of the new subinterval, 
+while the other interior point will become the end point of the new subinterval. 
+Therefore, in each subsequent iteration, only one new point is determined and only one evaluation of the function value is made.
+
+
+If f(c) ≤ f(d) and we need to make only one evaluation of the function, then we must have
+ 
+ (d-a) / (b-a) = (c-a) / (d-a)
+ (r(b-a)) / (b-a) = ((1-r)(b-a)) / (r(b-a))
+ r/1=((1-r))/r => r^2 + r - 1 = 0 => r = (-1 ± √5) / 2
+
+Since 1/2 < r < 1, we take r= (-1+√5) / 2
+
+Note that the number r divides the interval [a, b] in the ratio of the golden section, and hence the name of the mentioned method. 
+Analogously, if f(d) < f(c) then again we get that r = (-1+√5)/2.
+
+Let us now state the golden ratio algorithm.
+
+1.  Set the tolerance parameter (solution accuracy threshold ε)
+2.  Find the interval [a, b] that contains the required minimum (maximum)
+3.  If |a - b| < ε then stop, the solution is (a+b)/2
+4.  Calculate f(a) and f(b)
+5.  Construct two points c = a + ((3-√5)/2)*(b-a) and d = a + (√(5-1)/2)*(b-a)
+6.  Calculate f(c) and f(d)
+7.  If f(c) > f(d) the minimum is in [c, b], now put a = c and go back to step 3.
+    Note that currently d becomes c in the next step and thus we reduce one computation of f(x).
+8.  If f(c) ≤ f(d) then the minimum is in [a, d], now put d = b and go back to step 3.
+    Let's notice that now in the next step instantly c becomes d and we reduce one calculation of the quantity f(x).
+
+
+--->  The implementation of the algorithm in Python follows.
+
+
+1.	  import math
+2.	  from math import e
+3.	  number1 = (math.sqrt(5) – 1) / 2
+4.	  number2 = (3 - math.sqrt(5)) / 2
+5.	 
+6.	  def  golden_section (f, a, b, tol = 1e-5, h = None, c = None, d = None, fc = None, fd = None):
+7.	 	  print(a, b, c, d, fc, fd)
+8.	 	  (a, b) = (min(a, b), max(a, b))
+9.	 	  if h is None: h = b – a
+10.	 	  if h <= tol:
+11.	 		  return (a, b)
+12.	    if c is None:  c = a + number2 * h
+13.	    if d is None:  d = a + number1 * h
+14.	    if fc is None:  fc = f(c)
+15.	    if fd is None: fd = f(d)
+16.	    if fc < fd:
+17.		    return golden_section(f, a, d, tol, h*number1, c = None, fc = None, d = c, fd = fc)
+18.	    else:
+19.		    return golden_section(f, c, b, tol, h*number1, c = d, fc = fd, d = None, fd = None)
+
+
+In main program (invoke function): 
+
+1.	f = lambda x: e**((x-2)**2)       // example function
+2.	a = -5
+3.	b = 5
+4.	(c, d) = golden_section(f, a, b)
+5.	print(f((d + c)/2)) 
+
+So the program returns 1.0 where the given function reaches its minimum value.
+
+
+Graphic representation of the default function:
+//**image**
+
+Display of line number 7, i.e. display of the search results for the extreme.
+
+    -5	          5         	None	           None	           None	           None
+-1.18033988 	5	          1.18033988	      None	          1.95784171	    None
+1.18033988 	 3.54101966	  None	            2.63932022	    None	          1.50490586
+1.18033988	 2.63932022	  None	            2.08203932	    None	          1.00675315
+1.86917696	 2.08203932	  1.95048315	      None	          1.00245492	    None
+1.99340176	 2.01259555	  2.00073313	      None          	1.00000053	    None
+1.99997561	 2.00001245	  None	            1.99999838	    None	          1.00000000
+1.99998969	 2.00001245	  1.99999838	      None	          1.00000000	    None
+1.99998969	 2.00000376	  None	            1.99999838	    None	          1.00000000
+1.99999506	 2.00000376	  1.99999838	      None	          1.00000000	    None
+
+
+
+---------------------------------------------------------------------------------------
+
+
+Now we will look at finding the maximum or minimum of a function from another angle, i.e. by using the derivation. 
+
+Let the function ƒ be defined in the area of point a and let x be a point from that area. If the coefficient
+
+(ƒ(x)- ƒ(a)) / (x-a)
+
+has a limiting value when x → a, then we call that limiting value the derivative of the function ƒ at the point a and denote it by ƒ'(a). So:
+
+ƒ’(a)= 〖lim〗┬(x→ a)⁡〖(ƒ(x)- ƒ(a))/(x-a)〗
+
+We will provide the definitions for local maximum, local minimum, as well as for strict local maximum or minimum:
+
+The function ƒ has a strict local maximum at point a if there is a neighborhood of point a such that ƒ(a) > ƒ(x) for every x from that neighborhood.
+The function ƒ has a local maximum at point a if there is a neighborhood of point a such that ƒ(a) ≥ ƒ(x) for every x from that neighborhood.
+The function ƒ has a strict local minimum at point a if there is a neighborhood of point a such that ƒ(a) < ƒ(x) for every x from that neighborhood.
+The function ƒ has a local minimum at point a if there is a neighborhood of point a such that ƒ(a) ≤ ƒ(x) for every x from that neighborhood.
+
+In one word, we call the minimum and maximum the extrema of the function ƒ.
+
+PROCEDURE FOR DETERMINING LOCAL EXTREMES
+
+Assume that the function ƒ has a derivative at every point of the domain of definition. 
+We find the local extrema of the function ƒ by this procedure:
+
+1.  Determine the stationary points of the function ƒ with ƒ'(a)=0
+2.  Determine the second derivative and include stationary points:
+
+      if the number < 0 we have a maximum
+      if the number > 0 we have a minimum
+      
+3.  We include the stationary points in the initial function and get y
+
+
+
+A brief example to illustrate the above:
+
+    f(x)=2x^3 + 3x^2 - 36x - 10
+
+1.  We find the first derivative and equate it to 0:
+
+f′(x)=2•3x(3-1) + 3•2x(2-1) - 36•1 - 0 = 6x^2 + 6x - 36
+
+    6x^2 + 6x - 36 = 0  /: 6
+
+    x2 + x - 6 = 0
+
+According to the formula, we get that:
+ 
+     x1 = 2 and x2 = -3 → stationary points
+
+2.  We find the second derivative and include the stationary points to see if we have MAX or min:
+
+    f″(x) = 6•2x(2-1) + 6•1 - 0 = 12x + 6
+
+    f″(2) = 12•2 + 6 = 24 + 6 = 30        > 0 minimum
+    f″(-3) = 12•(-3) + 6 = -36 + 6 = -30  < 0 MAXIMUM
+
+3.  We include the stationary points in the initial function to get y:
+
+    f(2) = 2•23 + 3•22 - 36•2 - 10 = 16 + 12 - 72 - 10 = -54
+    f(-3) = 2•(-3)3 + 3•(-3)2 - 36•(-3) - 10 = -54 + 27 + 108 - 10 = 71
+
+It follows that min(2,-54) and MAX(-3,71).
+So, until now we have looked at finding the maximum and minimum of a given function through mathematical definitions and an example. 
+Now it's time to implement the algorithm.
+
+
+1.       from sympy import *
+2.	     x = Symbol('x', real = True)
+3.	     f = 2*x**3 + 3*x**2 - 36*x - 10
+4.	     first_der = f.diff(x)
+5.	     l = solve(first_der, x)
+6.	     x1 = l[0]
+7.	     x2 = l[1]
+8.	     second_der = f.diff(x).diff(x)
+9.	     second_der_for_x1 = second_der.subs(x, x1)
+10.	     second_der_for_x2 = second_der.subs(x, x2)
+
+11.	     maximum_for_x = 0
+12.	     minimum_for_x = 0
+13.	if second_der_for_x1 < 0:
+14.	     maximum_for_x = x1
+15.	     minimum_for_x = x2
+16.	elif second_der_for_x1 > 0:
+17.	     maximum_for_x = x2
+18.	     minimum_for_x = x1
+19.	elif second_der_for_x2 < 0:
+20.	     maximum_for_x = x2
+21.	     minimum_for_x = x1
+22.	elif second_der_for_x2 > 0:
+23.	     maximum_for_x = x1
+24.	     minimum_for_x = x2
+25.	 
+26.	first_der_for_y1 = f.subs(x, minimum)
+27.	first_der_for_y2 = f.subs(x, maximum)
+28.	 
+29.	minimum_dot = [minimum, first_der_for_y1]
+30.	maximum_dot = [maximum, first_der_for_y2]
+31.	 
+32.	print(minimum_dot)
+33.	print(maximum_dot)
+
+
+Sympy is a Python library for symbolic mathematics. 
+Its goal is to be an alternative to systems such as Mathematica or Maple, and to make the code as simple as possible. 
+Sympy is written entirely in Python and does not require any external libraries.
+
+In line number 1 we introduced from the sympy library * for multiplication. 
+Then we represented x as a symbol representing a variable in the function. 
+We chose the previous example for the function.
+
+Using the .diff(x) method over the function f, we derived f, i.e. determined its first derivative and obtained x2 + x - 6 = 0. 
+Then, in line number 5, the equation f^'(x) = 0 was solved, from which we obtained the stationary points, which are [-3, 2], 
+we presented the solutions in the form of a list l, and those points as x1 = -3 and x2 = 2.
+
+
+Next, we find the second derivative by calling the same .diff(x) method twice, 
+thus we get 12x + 6. In the 9th and 10th lines, the .subs() method is called with two parameters, 
+the first of which is our variable x a the second number x1, that means we add the number x1 to the variable x, 
+now in the second derivative we replace x with x1 and thus solve 12*(-3) + 6, we get the number -30.
+We repeat the procedure for the number x2 = 2 and get 30. 
+In the following lines of code, we check whether the obtained numbers are greater or less than zero and thus find the maximum x and minimum x.
+
+In the 26th line of the code, the points x1 and x2 are returned to the initial function f(x), 
+which gives us the minimum for y and the maximum for y. 
+We have everything we need to print a dot, and we print it by calling the print() function. 
+In our case we are only interested in the maximum point and it is MAX(-3, 71).
+
+Graphing the function, we see that our maximum is correct.
+
+
+//**image2**
+
